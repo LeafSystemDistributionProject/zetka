@@ -1,0 +1,31 @@
+# variables
+builddir = ../build
+root = .
+cc = clang
+ld = ld
+cflags = -Wall -Wextra -Wpedantic -c -m32 -ffreestanding
+ldflags = -m elf_i386 -Tlink.ld
+
+# rules
+rule cc
+    command = $cc $cflags $in -o $out
+
+rule as
+    command = nasm -fbin $in -o $out 
+
+rule altas
+    command = nasm -felf32 $in -o $out 
+
+rule link
+    command = $ld $ldflags -o zetka $in --oformat=binary --ignore-unresolved-symbol _GLOBAL_OFFSET_TABLE_
+
+
+# building
+build $root/bootsector: as $root/bootsector.s
+build $builddir/bootloader_entry.o: altas $root/bootloader_entry.s
+build $builddir/deligma_entry.o: altas $root/deligma_entry.s
+build $builddir/bootloader.o: cc $root/bootloader.c
+build $builddir/zprint.o: cc $root/zprint.c
+build $builddir/vga.o: cc $root/vga.c
+
+build all: link $builddir/bootloader.o $builddir/bootloader_entry.o $builddir/zprint.o $builddir/vga.o $builddir/deligma_entry.o

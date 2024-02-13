@@ -1,0 +1,5 @@
+/build
+/src/zetka
+/src/test.img
+/src/bootsector
+/src/run.sh
